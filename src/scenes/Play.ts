@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import LDtkLoader from '../systems/LDtkLoader';
 import Player from '../entities/Player';
+import DialogueTrigger from '../entities/DialogueTrigger';
 
 export default class Play extends Phaser.Scene {
   private player!: Player;
@@ -32,10 +33,17 @@ export default class Play extends Phaser.Scene {
       this.cache.json.add('level1', data);
       const loader = new LDtkLoader(this);
       const { collisionLayer, entities } = loader.load('level1', {
-        SpawnPoint: Player
+        SpawnPoint: Player,
+        Dialogue: DialogueTrigger
       });
 
       this.player = entities.find((e) => e instanceof Player) as Player;
+
+      entities.forEach((e) => {
+        if (e instanceof DialogueTrigger) {
+          e.setup(this.player);
+        }
+      });
 
       if (collisionLayer) {
         this.physics.add.collider(this.player, collisionLayer);

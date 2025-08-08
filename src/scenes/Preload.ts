@@ -6,11 +6,20 @@ export default class Preload extends Phaser.Scene {
   }
 
   preload() {
-    // Load placeholder assets
-    this.load.image(
-      'tiles',
-      'https://labs.phaser.io/assets/tilemaps/tiles/drawtiles-spaced.png'
-    );
+    // Create a single-tile checkerboard texture in memory
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 32, 32);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, 16, 16);
+      ctx.fillRect(16, 16, 16, 16);
+    }
+    const dataURL = canvas.toDataURL('image/png');
+    this.textures.addBase64('tiles', dataURL);
     this.load.spritesheet(
       'player',
       'https://labs.phaser.io/assets/sprites/dude.png',
