@@ -20,8 +20,7 @@ export default class Preload extends Phaser.Scene {
       'jump',
       'https://labs.phaser.io/assets/audio/SoundEffects/key.wav'
     );
-    // LDtk level and ink story
-    this.load.json('level1', '/levels/lvl_01_test.json');
+    // Ink story
     this.load.json('inkTest', '/dialogue/sample.ink.json');
   }
 
