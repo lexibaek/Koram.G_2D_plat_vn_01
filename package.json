@@ -13,7 +13,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "phaser": "^3.90.0"
+    "phaser": "^3.90.0",
+    "inkjs": "^1.11.1"
   },
   "devDependencies": {
     "typescript": "^5.9.2",
