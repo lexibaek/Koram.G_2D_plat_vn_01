@@ -1,0 +1,7 @@
+{
+  "atlases": [],
+  "tilesets": ["assets/tilesets/overworld"],
+  "levels": ["assets/levels/lvl_01_test.json"],
+  "audio": { "bgm": [], "sfx": [] },
+  "fonts": []
+}
