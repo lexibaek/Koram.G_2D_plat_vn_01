@@ -22,7 +22,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     } else {
       this.setVelocityX(0);
     }
-    if (this.input.jump && this.body.blocked.down) {
+    if (this.input.drop && this.body.blocked.down) {
+      this.body.checkCollision.down = false;
+      this.setVelocityY(100);
+      this.scene.time.delayedCall(250, () => {
+        this.body.checkCollision.down = true;
+      });
+    } else if (this.input.jump && this.body.blocked.down) {
       this.setVelocityY(-330);
     }
   }

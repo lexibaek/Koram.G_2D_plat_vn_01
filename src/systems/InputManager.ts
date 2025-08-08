@@ -87,12 +87,16 @@ export default class InputManager {
     );
   }
 
-  get up() {
+  get lookUp() {
     return (
       this.cursors.up.isDown ||
       (this.wasd.W && this.wasd.W.isDown) ||
       this.joystickDir.y < -0.3
     );
+  }
+
+  get up() {
+    return this.lookUp;
   }
 
   get down() {
@@ -105,6 +109,10 @@ export default class InputManager {
 
   get jump() {
     return this.jumpKey.isDown || this.jumpPressed;
+  }
+
+  get drop() {
+    return this.down && this.jump;
   }
 
   get interact() {
