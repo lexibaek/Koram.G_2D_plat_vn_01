@@ -5,6 +5,7 @@ import DialogueTrigger from '../entities/DialogueTrigger';
 
 export default class Play extends Phaser.Scene {
   private player!: Player;
+  private debugText!: Phaser.GameObjects.Text;
 
   constructor() {
     super('Play');
@@ -50,6 +51,7 @@ export default class Play extends Phaser.Scene {
       }
 
       this.cameras.main.startFollow(this.player);
+      this.createDebugOverlay();
     } catch (err) {
       const width = this.scale.width;
       const height = this.scale.height;
@@ -71,6 +73,27 @@ export default class Play extends Phaser.Scene {
       this.physics.add.collider(this.player, ground);
 
       this.cameras.main.startFollow(this.player);
+      this.createDebugOverlay();
     }
+  }
+
+  private createDebugOverlay() {
+    this.debugText = this.add
+      .text(10, 10, '', { fontSize: '12px', color: '#fff' })
+      .setScrollFactor(0);
+  }
+
+  update() {
+    if (!this.player || !this.debugText) return;
+    const input = this.player.input;
+    const move = input.move;
+    const look = input.look;
+    this.debugText.setText(
+      `move: (${move.x.toFixed(2)}, ${move.y.toFixed(2)})\n` +
+        `look: (${look.x.toFixed(2)}, ${look.y.toFixed(2)})\n` +
+        `jump: ${input.jumpPressed}\n` +
+        `interact: ${input.interact}\n` +
+        `drop: ${input.dropThrough}`
+    );
   }
 }
