@@ -14,8 +14,11 @@ export default class InputManager {
 
   private jumpButton: Phaser.GameObjects.Arc;
   private interactButton: Phaser.GameObjects.Arc;
-  private jumpPressed = false;
-  private interactPressed = false;
+  private jumpButtonDown = false;
+  private interactButtonDown = false;
+
+  private dropThroughFlag = false;
+  private dropComboPrev = false;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -43,20 +46,30 @@ export default class InputManager {
         this.joystickDir.set(0, 0);
         this.joystickThumb.setPosition(x, y);
       }
-      this.jumpPressed = false;
-      this.interactPressed = false;
+      this.jumpButtonDown = false;
+      this.interactButtonDown = false;
     });
 
     const btnR = 32;
     const jx = 80;
     const jy = scene.scale.height - 80;
-    this.jumpButton = scene.add.circle(jx, jy, btnR, 0x888888, 0.3).setScrollFactor(0).setInteractive();
-    this.jumpButton.on('pointerdown', () => (this.jumpPressed = true));
+    this.jumpButton = scene
+      .add.circle(jx, jy, btnR, 0x888888, 0.3)
+      .setScrollFactor(0)
+      .setInteractive();
+    this.jumpButton.on('pointerdown', () => (this.jumpButtonDown = true));
 
     const ix = 80;
     const iy = scene.scale.height - 160;
-    this.interactButton = scene.add.circle(ix, iy, btnR, 0x888888, 0.3).setScrollFactor(0).setInteractive();
-    this.interactButton.on('pointerdown', () => (this.interactPressed = true));
+    this.interactButton = scene
+      .add.circle(ix, iy, btnR, 0x888888, 0.3)
+      .setScrollFactor(0)
+      .setInteractive();
+    this.interactButton.on('pointerdown', () => (this.interactButtonDown = true));
+
+    this.scene.events.on('update', this.handleUpdate, this);
+
+    this.scene.time.addEvent({ delay: 500, loop: true, callback: this.logInputs, callbackScope: this });
   }
 
   private updateJoystick(p: Phaser.Input.Pointer) {
@@ -107,15 +120,60 @@ export default class InputManager {
     );
   }
 
-  get jump() {
-    return this.jumpKey.isDown || this.jumpPressed;
+  get move() {
+    const x = Math.abs(this.joystickDir.x) > 0.3
+      ? this.joystickDir.x
+      : this.left ? -1 : this.right ? 1 : 0;
+    const y = Math.abs(this.joystickDir.y) > 0.3
+      ? this.joystickDir.y
+      : this.up ? -1 : this.down ? 1 : 0;
+    return new Phaser.Math.Vector2(x, y);
   }
 
-  get drop() {
-    return this.down && this.jump;
+  get look() {
+    const y = Math.abs(this.joystickDir.y) > 0.3
+      ? this.joystickDir.y
+      : this.lookUp ? -1 : this.down ? 1 : 0;
+    return new Phaser.Math.Vector2(0, y);
+  }
+
+  get jumpPressed() {
+    return this.jumpKey.isDown || this.jumpButtonDown;
+  }
+
+  get dropThrough() {
+    return this.dropThroughFlag;
   }
 
   get interact() {
-    return this.interactKey.isDown || this.interactPressed;
+    return this.interactKey.isDown || this.interactButtonDown;
+  }
+
+  private handleUpdate() {
+    const combo = this.down && this.jumpPressed;
+    this.dropThroughFlag = combo && !this.dropComboPrev;
+    this.dropComboPrev = combo;
+  }
+
+  private logInputs() {
+    const info = {
+      move: { x: Number(this.move.x.toFixed(2)), y: Number(this.move.y.toFixed(2)) },
+      look: { x: Number(this.look.x.toFixed(2)), y: Number(this.look.y.toFixed(2)) },
+      jumpPressed: this.jumpPressed,
+      interact: this.interact,
+      dropThrough: this.dropThrough
+    };
+    if (
+      info.move.x !== 0 ||
+      info.move.y !== 0 ||
+      info.look.x !== 0 ||
+      info.look.y !== 0 ||
+      info.jumpPressed ||
+      info.interact ||
+      info.dropThrough
+    ) {
+      // eslint-disable-next-line no-console
+      console.log('input', info);
+    }
   }
 }

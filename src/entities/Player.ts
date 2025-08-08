@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import InputManager from '../systems/InputManager';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  private input: InputManager;
+  public input: InputManager;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'player');
@@ -22,13 +22,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     } else {
       this.setVelocityX(0);
     }
-    if (this.input.drop && this.body.blocked.down) {
+    if (this.input.dropThrough && this.body.blocked.down) {
       this.body.checkCollision.down = false;
       this.setVelocityY(100);
       this.scene.time.delayedCall(250, () => {
         this.body.checkCollision.down = true;
       });
-    } else if (this.input.jump && this.body.blocked.down) {
+    } else if (this.input.jumpPressed && this.body.blocked.down) {
       this.setVelocityY(-330);
     }
   }
