@@ -1,0 +1,32 @@
+{
+  "pxWid": 160,
+  "pxHei": 160,
+  "layerInstances": [
+    {
+      "__identifier": "Ground",
+      "__type": "IntGrid",
+      "gridSize": 32,
+      "intGridCsv": [
+        0,0,0,0,0,
+        0,0,0,0,0,
+        0,0,1,1,1,
+        0,0,1,1,1,
+        0,0,1,1,1
+      ],
+      "__cWid": 5,
+      "__cHei": 5
+    },
+    {
+      "__identifier": "Entities",
+      "__type": "Entities",
+      "entityInstances": [
+        {
+          "__identifier": "SpawnPoint",
+          "px": [32, 32],
+          "width": 16,
+          "height": 16
+        }
+      ]
+    }
+  ]
+}
