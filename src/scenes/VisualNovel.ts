@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 import { Story } from 'inkjs';
+import DialogueBox from '../ui/DialogueBox';
 
 export default class VisualNovel extends Phaser.Scene {
   private story!: Story;
-  private text!: Phaser.GameObjects.Text;
-  private choiceTexts: Phaser.GameObjects.Text[] = [];
+  private dialogue!: DialogueBox;
 
   constructor() {
     super('VisualNovel');
@@ -14,61 +14,33 @@ export default class VisualNovel extends Phaser.Scene {
     const data = this.cache.json.get('inkTest');
     this.story = new Story(data);
 
-    this.text = this.add.text(20, 20, '', {
-      wordWrap: { width: this.scale.width - 40 },
-      color: '#ffffff',
-      fontSize: '18px'
+    this.dialogue = new DialogueBox(this);
+    this.dialogue.onNext(() => {
+      if (this.story.currentChoices.length === 0) {
+        this.advance();
+      }
     });
-    this.text.setScrollFactor(0);
 
-    this.input.on('pointerdown', () => this.advance());
-    this.input.keyboard.on('keydown-SPACE', () => this.advance());
     this.input.keyboard.on('keydown-V', () => this.scene.start('Play'));
 
     this.advance();
   }
 
-  private clearChoices() {
-    this.choiceTexts.forEach((c) => c.destroy());
-    this.choiceTexts = [];
-  }
-
   private advance() {
-    this.clearChoices();
+    this.dialogue.clearChoices();
+
     if (this.story.canContinue) {
       const line = this.story.Continue().trim();
-      this.text.setText(line);
+      this.dialogue.setText(line);
     } else if (this.story.currentChoices.length > 0) {
-      this.story.currentChoices.forEach((choice, index) => {
-        const txt = this.add
-          .text(20, 100 + index * 30, choice.text, {
-            color: '#00ff00',
-            fontSize: '16px'
-          })
-          .setInteractive();
-        txt.on('pointerdown', () => {
-          this.story.ChooseChoiceIndex(index);
-          this.advance();
-        });
-        this.choiceTexts.push(txt);
-      });
-    } else if (this.choiceTexts.length === 0) {
-      // Fallback placeholder choices when story has none
-      ['Choice A', 'Choice B'].forEach((text, index) => {
-        const txt = this.add
-          .text(20, 100 + index * 30, text, {
-            color: '#00ff00',
-            fontSize: '16px'
-          })
-          .setInteractive();
-        txt.on('pointerdown', () => {
-          this.text.setText(`You selected: ${text}`);
-          this.clearChoices();
-        });
-        this.choiceTexts.push(txt);
+      const choices = this.story.currentChoices.map((c) => c.text);
+      this.dialogue.setChoices(choices, (index) => {
+        this.story.ChooseChoiceIndex(index);
+        this.advance();
       });
     } else {
-      this.text.setText('The End. Press V to return.');
+      this.dialogue.setText('The End. Press V to return.');
     }
   }
 }
+
