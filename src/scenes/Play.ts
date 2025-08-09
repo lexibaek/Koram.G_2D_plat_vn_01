@@ -2,9 +2,12 @@ import Phaser from 'phaser';
 import LDtkLoader from '../systems/LDtkLoader';
 import Player from '../entities/Player';
 import DialogueTrigger from '../entities/DialogueTrigger';
+import PhysicsAdapter from '../physics/PhysicsAdapter';
+import ArcadeAdapter from '../physics/ArcadeAdapter';
 
 export default class Play extends Phaser.Scene {
   private player!: Player;
+  private physicsAdapter!: PhysicsAdapter;
   private debugText!: Phaser.GameObjects.Text;
 
   constructor() {
@@ -12,6 +15,8 @@ export default class Play extends Phaser.Scene {
   }
 
   async create() {
+    this.physicsAdapter = new ArcadeAdapter(this);
+    this.physicsAdapter.setGravity(0, 500);
     await this.loadLevel();
 
     // Hotkey to switch to Visual Novel scene
@@ -32,7 +37,7 @@ export default class Play extends Phaser.Scene {
       if (!response.ok) throw new Error('Missing level');
       const data = await response.json();
       this.cache.json.add('level1', data);
-      const loader = new LDtkLoader(this);
+      const loader = new LDtkLoader(this, this.physicsAdapter);
       const { collisionLayer, entities } = loader.load('level1', {
         SpawnPoint: Player,
         Dialogue: DialogueTrigger
@@ -47,7 +52,7 @@ export default class Play extends Phaser.Scene {
       });
 
       if (collisionLayer) {
-        this.physics.add.collider(this.player, collisionLayer);
+        this.physicsAdapter.collide(this.player, collisionLayer);
       }
 
       this.cameras.main.startFollow(this.player);
@@ -63,14 +68,15 @@ export default class Play extends Phaser.Scene {
       const ground = this.add
         .rectangle(0, height - groundHeight, width, groundHeight, 0x00ff00)
         .setOrigin(0, 0);
-      this.physics.add.existing(ground, true);
+      this.physicsAdapter.createBody('static', { gameObject: ground, width, height: groundHeight });
 
       this.player = new Player(
         this,
+        this.physicsAdapter,
         width / 2,
         height - groundHeight - 50
       );
-      this.physics.add.collider(this.player, ground);
+      this.physicsAdapter.collide(this.player, ground);
 
       this.cameras.main.startFollow(this.player);
       this.createDebugOverlay();
