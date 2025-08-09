@@ -14,6 +14,8 @@ export default class Player extends Phaser.GameObjects.Sprite {
   private jumpTimer = 0;
   private speed = 160;
   private jumpSpeed = 330;
+  private hp = 100;
+  private inventory: string[] = [];
 
   constructor(scene: Phaser.Scene, physics: PhysicsAdapter, x: number, y: number) {
     super(scene, x, y, 'player');
@@ -91,5 +93,20 @@ export default class Player extends Phaser.GameObjects.Sprite {
       this.jumpTimer = 0;
       this.coyoteTimer = 0;
     }
+  }
+
+  getSnapshot() {
+    return {
+      x: this.x,
+      y: this.y,
+      hp: this.hp,
+      inventory: [...this.inventory]
+    };
+  }
+
+  restore(snapshot: { x: number; y: number; hp: number; inventory: string[] }) {
+    this.setPosition(snapshot.x, snapshot.y);
+    this.hp = snapshot.hp;
+    this.inventory = [...snapshot.inventory];
   }
 }

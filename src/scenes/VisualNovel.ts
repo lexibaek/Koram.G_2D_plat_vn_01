@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import DialogueBox from '../ui/DialogueBox';
+import SaveManager from '../systems/SaveManager';
 
 export default class VisualNovel extends Phaser.Scene {
   private story?: any;
@@ -11,8 +12,15 @@ export default class VisualNovel extends Phaser.Scene {
   }
 
   create() {
-    this.input.keyboard.on('keydown-V', () => this.scene.start('Play'));
+    this.input.keyboard.on('keydown-V', () => {
+      SaveManager.saveAuto();
+      this.scene.start('Play');
+    });
     this.input.keyboard.on('keydown-R', () => this.loadStory());
+    this.input.keyboard.on('keydown-ESC', () => {
+      this.scene.pause();
+      this.scene.launch('Pause');
+    });
 
     this.loadStory();
   }
@@ -34,6 +42,14 @@ export default class VisualNovel extends Phaser.Scene {
       const data = await res.json();
       if (data && typeof data === 'object' && 'inkVersion' in data) {
         this.story = new ink.Story(data);
+        const snap = SaveManager.getSnapshot();
+        if (snap.inkStateJson) {
+          try {
+            this.story.state.LoadJson(snap.inkStateJson);
+          } catch {
+            // ignore
+          }
+        }
 
         this.dialogue = new DialogueBox(this);
         this.dialogue.onNext(() => {
@@ -78,6 +94,8 @@ export default class VisualNovel extends Phaser.Scene {
     } else {
       this.dialogue.setText('The End. Press V to return.');
     }
+    SaveManager.updateInkState(this.story.state.toJson());
+    SaveManager.saveAuto();
   }
 }
 

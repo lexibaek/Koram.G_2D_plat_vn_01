@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import manifest from '../config/manifest.json';
 import ManifestLoader from '../systems/ManifestLoader';
+import SaveManager from '../systems/SaveManager';
 
 export default class Preload extends Phaser.Scene {
   constructor() {
@@ -13,6 +14,11 @@ export default class Preload extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start('Play');
+    const snap = SaveManager.loadAuto();
+    if (snap) {
+      this.scene.start('Play', { snapshot: snap });
+    } else {
+      this.scene.start('MainMenu');
+    }
   }
 }
