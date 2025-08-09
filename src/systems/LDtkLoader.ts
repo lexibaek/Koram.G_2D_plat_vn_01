@@ -55,10 +55,42 @@ export default class LDtkLoader {
           tileWidth: layer.gridSize ?? 0,
           tileHeight: layer.gridSize ?? 0
         });
-        const tiles = map.addTilesetImage('tiles');
+        const tiles = map.addTilesetImage('tile32');
         const tileLayer = map.createLayer(0, tiles, 0, 0);
-        tileLayer.setCollisionByExclusion([-1]);
-        collisionLayer = tileLayer;
+        if (layer.__identifier === 'Ground') {
+          tileLayer.setCollisionByExclusion([-1]);
+          collisionLayer = tileLayer;
+        }
+      } else if (
+        (layer.__type === 'Tiles' || layer.__type === 'AutoLayer') &&
+        (layer as any).gridTiles
+      ) {
+        const width = layer.__cWid ?? 0;
+        const height = layer.__cHei ?? 0;
+        const grid: number[][] = Array.from({ length: height }, () =>
+          Array(width).fill(-1)
+        );
+        const tilesData = (layer as any).gridTiles as {
+          px: [number, number];
+        }[];
+        tilesData.forEach((t) => {
+          const gx = Math.floor(t.px[0] / (layer.gridSize ?? 1));
+          const gy = Math.floor(t.px[1] / (layer.gridSize ?? 1));
+          if (gy >= 0 && gy < height && gx >= 0 && gx < width) {
+            grid[gy][gx] = 0;
+          }
+        });
+        const map = this.scene.make.tilemap({
+          data: grid,
+          tileWidth: layer.gridSize ?? 0,
+          tileHeight: layer.gridSize ?? 0
+        });
+        const tiles = map.addTilesetImage('tile32');
+        const tileLayer = map.createLayer(0, tiles, 0, 0);
+        if (layer.__identifier === 'Ground') {
+          tileLayer.setCollisionByExclusion([-1]);
+          collisionLayer = tileLayer;
+        }
       } else if (layer.__type === 'Entities' && layer.entityInstances) {
         layer.entityInstances.forEach((entity) => {
           const Ctor = entityMap[entity.__identifier];

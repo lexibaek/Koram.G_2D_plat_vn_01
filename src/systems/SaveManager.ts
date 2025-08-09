@@ -18,7 +18,7 @@ export default class SaveManager {
   private static readonly SLOT_PREFIX = 'save_slot_';
 
   private static current: GameSnapshot = {
-    levelId: 'level1',
+    levelId: 'lvl_01_test',
     checkpointId: 'start',
     player: { x: 0, y: 0, hp: 100, inventory: [] },
     inkStateJson: null,

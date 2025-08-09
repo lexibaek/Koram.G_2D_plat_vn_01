@@ -1,7 +1,16 @@
 {
+  "__identifier": "lvl_01_test",
   "pxWid": 1280,
   "pxHei": 384,
   "layerInstances": [
+    {
+      "__identifier": "Background",
+      "__type": "Tiles",
+      "gridSize": 32,
+      "__cWid": 40,
+      "__cHei": 12,
+      "gridTiles": []
+    },
     {
       "__identifier": "Ground",
       "__type": "IntGrid",
@@ -492,18 +501,33 @@
       ]
     },
     {
+      "__identifier": "Foreground",
+      "__type": "Tiles",
+      "gridSize": 32,
+      "__cWid": 40,
+      "__cHei": 12,
+      "gridTiles": []
+    },
+    {
       "__identifier": "Entities",
       "__type": "Entities",
+      "gridSize": 32,
       "entityInstances": [
         {
-          "__identifier": "SpawnPoint",
+          "__identifier": "spawn",
           "px": [
             64,
             256
+          ],
+          "fieldInstances": [
+            {
+              "__identifier": "facing",
+              "__value": "right"
+            }
           ]
         },
         {
-          "__identifier": "Dialogue",
+          "__identifier": "dialogue",
           "px": [
             320,
             256
@@ -512,10 +536,26 @@
             {
               "__identifier": "knot",
               "__value": "intro"
+            },
+            {
+              "__identifier": "once",
+              "__value": true
+            },
+            {
+              "__identifier": "facingLock",
+              "__value": false
             }
           ]
         }
       ]
+    },
+    {
+      "__identifier": "Decor",
+      "__type": "Tiles",
+      "gridSize": 32,
+      "__cWid": 40,
+      "__cHei": 12,
+      "gridTiles": []
     }
   ]
 }
