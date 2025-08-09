@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import Boot from './scenes/Boot';
 import Preload from './scenes/Preload';
+import MainMenu from './scenes/MainMenu';
 import Play from './scenes/Play';
 import VisualNovel from './scenes/VisualNovel';
+import Pause from './scenes/Pause';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -16,7 +18,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [Boot, Preload, Play, VisualNovel]
+  scene: [Boot, Preload, MainMenu, Play, VisualNovel, Pause]
 };
 
 export default new Phaser.Game(config);

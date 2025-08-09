@@ -4,29 +4,44 @@ import Player from '../entities/Player';
 import DialogueTrigger from '../entities/DialogueTrigger';
 import PhysicsAdapter from '../physics/PhysicsAdapter';
 import ArcadeAdapter from '../physics/ArcadeAdapter';
+import SaveManager, { GameSnapshot } from '../systems/SaveManager';
 
 export default class Play extends Phaser.Scene {
   private player!: Player;
   private physicsAdapter!: PhysicsAdapter;
   private debugText!: Phaser.GameObjects.Text;
+  private checkpointId = 'start';
+  private startSnapshot?: GameSnapshot;
 
   constructor() {
     super('Play');
   }
 
-  async create() {
+  async create(data?: { snapshot?: GameSnapshot }) {
+    this.startSnapshot = data?.snapshot;
     this.physicsAdapter = new ArcadeAdapter(this);
     this.physicsAdapter.setGravity(0, 500);
     await this.loadLevel();
 
     // Hotkey to switch to Visual Novel scene
     this.input.keyboard.on('keydown-V', () => {
+      SaveManager.saveAuto();
       this.scene.start('VisualNovel');
     });
 
     // Debug key to retry loading the level
     this.input.keyboard.on('keydown-L', () => {
       this.scene.restart();
+    });
+
+    // Simulated checkpoint and level completion
+    this.input.keyboard.on('keydown-C', () => this.hitCheckpoint('checkpoint'));
+    this.input.keyboard.on('keydown-K', () => this.hitCheckpoint('complete'));
+
+    // Pause menu
+    this.input.keyboard.on('keydown-ESC', () => {
+      this.scene.pause();
+      this.scene.launch('Pause');
     });
   }
 
@@ -44,6 +59,13 @@ export default class Play extends Phaser.Scene {
       });
 
       this.player = entities.find((e) => e instanceof Player) as Player;
+      if (this.startSnapshot) {
+        this.checkpointId = this.startSnapshot.checkpointId;
+        this.player.restore(this.startSnapshot.player);
+      }
+      SaveManager.updateLevel('level1', this.checkpointId);
+      SaveManager.updatePlayer(this.player.getSnapshot());
+      SaveManager.saveAuto();
 
       entities.forEach((e) => {
         if (e instanceof DialogueTrigger) {
@@ -78,6 +100,14 @@ export default class Play extends Phaser.Scene {
       );
       this.physicsAdapter.collide(this.player, ground);
 
+      if (this.startSnapshot) {
+        this.checkpointId = this.startSnapshot.checkpointId;
+        this.player.restore(this.startSnapshot.player);
+      }
+      SaveManager.updateLevel('level1', this.checkpointId);
+      SaveManager.updatePlayer(this.player.getSnapshot());
+      SaveManager.saveAuto();
+
       this.cameras.main.startFollow(this.player);
       this.createDebugOverlay();
     }
@@ -91,6 +121,7 @@ export default class Play extends Phaser.Scene {
 
   update() {
     if (!this.player || !this.debugText) return;
+    SaveManager.updatePlayer(this.player.getSnapshot());
     const input = this.player.input;
     const move = input.move;
     const look = input.look;
@@ -101,5 +132,13 @@ export default class Play extends Phaser.Scene {
         `interact: ${input.interact}\n` +
         `drop: ${input.dropThrough}`
     );
+  }
+
+  // Simulated checkpoint trigger for autosave
+  public hitCheckpoint(id: string) {
+    this.checkpointId = id;
+    SaveManager.updateLevel('level1', this.checkpointId);
+    SaveManager.updatePlayer(this.player.getSnapshot());
+    SaveManager.saveAuto();
   }
 }
