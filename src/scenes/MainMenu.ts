@@ -18,7 +18,7 @@ export default class MainMenu extends Phaser.Scene {
 
     this.input.keyboard.on('keydown-N', () => {
       const fresh: GameSnapshot = {
-        levelId: 'level1',
+        levelId: 'lvl_01_test',
         checkpointId: 'start',
         player: { x: 0, y: 0, hp: 100, inventory: [] },
         inkStateJson: null,

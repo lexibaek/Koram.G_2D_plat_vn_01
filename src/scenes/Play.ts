@@ -46,16 +46,11 @@ export default class Play extends Phaser.Scene {
   }
 
   private async loadLevel() {
-    this.cache.json.remove('level1');
     try {
-      const response = await fetch('/levels/lvl_01_test.json');
-      if (!response.ok) throw new Error('Missing level');
-      const data = await response.json();
-      this.cache.json.add('level1', data);
       const loader = new LDtkLoader(this, this.physicsAdapter);
-      const { collisionLayer, entities } = loader.load('level1', {
-        SpawnPoint: Player,
-        Dialogue: DialogueTrigger
+      const { collisionLayer, entities } = loader.load('lvl_01_test.json', {
+        spawn: Player,
+        dialogue: DialogueTrigger
       });
 
       this.player = entities.find((e) => e instanceof Player) as Player;
@@ -63,7 +58,7 @@ export default class Play extends Phaser.Scene {
         this.checkpointId = this.startSnapshot.checkpointId;
         this.player.restore(this.startSnapshot.player);
       }
-      SaveManager.updateLevel('level1', this.checkpointId);
+      SaveManager.updateLevel('lvl_01_test', this.checkpointId);
       SaveManager.updatePlayer(this.player.getSnapshot());
       SaveManager.saveAuto();
 
@@ -104,7 +99,7 @@ export default class Play extends Phaser.Scene {
         this.checkpointId = this.startSnapshot.checkpointId;
         this.player.restore(this.startSnapshot.player);
       }
-      SaveManager.updateLevel('level1', this.checkpointId);
+      SaveManager.updateLevel('lvl_01_test', this.checkpointId);
       SaveManager.updatePlayer(this.player.getSnapshot());
       SaveManager.saveAuto();
 
@@ -137,7 +132,7 @@ export default class Play extends Phaser.Scene {
   // Simulated checkpoint trigger for autosave
   public hitCheckpoint(id: string) {
     this.checkpointId = id;
-    SaveManager.updateLevel('level1', this.checkpointId);
+    SaveManager.updateLevel('lvl_01_test', this.checkpointId);
     SaveManager.updatePlayer(this.player.getSnapshot());
     SaveManager.saveAuto();
   }

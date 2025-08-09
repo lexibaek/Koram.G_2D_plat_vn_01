@@ -14,6 +14,14 @@ export default class Preload extends Phaser.Scene {
   }
 
   create() {
+    const graphics = this.add.graphics();
+    graphics.fillStyle(0xcccccc, 1);
+    graphics.fillRect(0, 0, 16, 16);
+    graphics.fillStyle(0x888888, 1);
+    graphics.fillRect(16, 16, 16, 16);
+    graphics.generateTexture('tile32', 32, 32);
+    graphics.destroy();
+
     const snap = SaveManager.loadAuto();
     if (snap) {
       this.scene.start('Play', { snapshot: snap });
