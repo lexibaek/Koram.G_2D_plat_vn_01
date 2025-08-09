@@ -6,15 +6,18 @@ export default class VisualNovel extends Phaser.Scene {
   private story?: any;
   private dialogue?: DialogueBox;
   private errorText?: Phaser.GameObjects.Text;
+  private startKnot?: string;
 
   constructor() {
     super('VisualNovel');
   }
 
-  create() {
+  create(data?: { knot?: string }) {
+    this.startKnot = data?.knot;
     this.input.keyboard.on('keydown-V', () => {
+      SaveManager.updateInkState(null);
       SaveManager.saveAuto();
-      this.scene.start('Play');
+      this.scene.start('Play', { snapshot: SaveManager.getSnapshot() });
     });
     this.input.keyboard.on('keydown-R', () => this.loadStory());
     this.input.keyboard.on('keydown-ESC', () => {
@@ -42,12 +45,20 @@ export default class VisualNovel extends Phaser.Scene {
       const data = await res.json();
       if (data && typeof data === 'object' && 'inkVersion' in data) {
         this.story = new ink.Story(data);
-        const snap = SaveManager.getSnapshot();
-        if (snap.inkStateJson) {
+        if (this.startKnot) {
           try {
-            this.story.state.LoadJson(snap.inkStateJson);
+            this.story.ChoosePathString(this.startKnot);
           } catch {
-            // ignore
+            // ignore invalid knots
+          }
+        } else {
+          const snap = SaveManager.getSnapshot();
+          if (snap.inkStateJson) {
+            try {
+              this.story.state.LoadJson(snap.inkStateJson);
+            } catch {
+              // ignore
+            }
           }
         }
 
@@ -92,7 +103,10 @@ export default class VisualNovel extends Phaser.Scene {
         this.advance();
       });
     } else {
-      this.dialogue.setText('The End. Press V to return.');
+      SaveManager.updateInkState(null);
+      SaveManager.saveAuto();
+      this.scene.start('Play', { snapshot: SaveManager.getSnapshot() });
+      return;
     }
     SaveManager.updateInkState(this.story.state.toJson());
     SaveManager.saveAuto();

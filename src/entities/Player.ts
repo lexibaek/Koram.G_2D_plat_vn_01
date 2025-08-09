@@ -17,7 +17,13 @@ export default class Player extends Phaser.GameObjects.Sprite {
   private hp = 100;
   private inventory: string[] = [];
 
-  constructor(scene: Phaser.Scene, physics: PhysicsAdapter, x: number, y: number) {
+  constructor(
+    scene: Phaser.Scene,
+    physics: PhysicsAdapter,
+    x: number,
+    y: number,
+    _data?: Record<string, any>
+  ) {
     super(scene, x, y, 'player');
     scene.add.existing(this);
     this.setOrigin(0.5, 28 / 32);
