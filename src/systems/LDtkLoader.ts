@@ -1,6 +1,12 @@
 import Phaser from 'phaser';
+import PhysicsAdapter from '../physics/PhysicsAdapter';
 
-type EntityConstructor = new (scene: Phaser.Scene, x: number, y: number) => Phaser.GameObjects.GameObject;
+type EntityConstructor = new (
+  scene: Phaser.Scene,
+  physics: PhysicsAdapter,
+  x: number,
+  y: number
+) => Phaser.GameObjects.GameObject;
 
 interface LDtkEntity {
   __identifier: string;
@@ -24,7 +30,7 @@ interface LDtkLevel {
 }
 
 export default class LDtkLoader {
-  constructor(private scene: Phaser.Scene) {}
+  constructor(private scene: Phaser.Scene, private physics: PhysicsAdapter) {}
 
   load(key: string, entityMap: Record<string, EntityConstructor> = {}) {
     const data = this.scene.cache.json.get(key) as LDtkLevel;
@@ -57,7 +63,7 @@ export default class LDtkLoader {
         layer.entityInstances.forEach((entity) => {
           const Ctor = entityMap[entity.__identifier];
           if (Ctor) {
-            const obj = new Ctor(this.scene, entity.px[0], entity.px[1]);
+            const obj = new Ctor(this.scene, this.physics, entity.px[0], entity.px[1]);
             entities.push(obj);
           }
         });

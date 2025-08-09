@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export default class InputManager {
+export default class InputManager extends Phaser.Events.EventEmitter {
   private scene: Phaser.Scene;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd: { [key: string]: Phaser.Input.Keyboard.Key };
@@ -20,7 +20,12 @@ export default class InputManager {
   private dropThroughFlag = false;
   private dropComboPrev = false;
 
+  private prevMove = new Phaser.Math.Vector2();
+  private prevLook = new Phaser.Math.Vector2();
+  private prevJump = false;
+
   constructor(scene: Phaser.Scene) {
+    super();
     this.scene = scene;
 
     this.cursors = scene.input.keyboard.createCursorKeys();
@@ -153,6 +158,27 @@ export default class InputManager {
     const combo = this.down && this.jumpPressed;
     this.dropThroughFlag = combo && !this.dropComboPrev;
     this.dropComboPrev = combo;
+
+    const move = this.move;
+    if (!move.equals(this.prevMove)) {
+      this.prevMove.copy(move);
+      this.emit('move', move.clone());
+    }
+
+    const look = this.look;
+    if (!look.equals(this.prevLook)) {
+      this.prevLook.copy(look);
+      this.emit('look', look.clone());
+    }
+
+    if (this.jumpPressed && !this.prevJump) {
+      this.emit('jump');
+    }
+    this.prevJump = this.jumpPressed;
+
+    if (this.dropThroughFlag) {
+      this.emit('drop');
+    }
   }
 
   private logInputs() {
