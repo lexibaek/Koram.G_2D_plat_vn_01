@@ -50,6 +50,14 @@ export default class SaveManager {
     this.current.flags = flags;
   }
 
+  static getFlag(key: string) {
+    return this.current.flags[key];
+  }
+
+  static setFlag(key: string, value: any = true) {
+    this.current.flags[key] = value;
+  }
+
   static saveAuto() {
     try {
       localStorage.setItem(this.AUTO_KEY, JSON.stringify(this.current));

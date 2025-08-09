@@ -5,12 +5,19 @@ type EntityConstructor = new (
   scene: Phaser.Scene,
   physics: PhysicsAdapter,
   x: number,
-  y: number
+  y: number,
+  data?: Record<string, any>
 ) => Phaser.GameObjects.GameObject;
+
+interface LDtkField {
+  __identifier: string;
+  __value: any;
+}
 
 interface LDtkEntity {
   __identifier: string;
   px: [number, number];
+  fieldInstances?: LDtkField[];
 }
 
 interface LDtkLayer {
@@ -95,7 +102,17 @@ export default class LDtkLoader {
         layer.entityInstances.forEach((entity) => {
           const Ctor = entityMap[entity.__identifier];
           if (Ctor) {
-            const obj = new Ctor(this.scene, this.physics, entity.px[0], entity.px[1]);
+            const fields: Record<string, any> = {};
+            entity.fieldInstances?.forEach((f) => {
+              fields[f.__identifier] = f.__value;
+            });
+            const obj = new Ctor(
+              this.scene,
+              this.physics,
+              entity.px[0],
+              entity.px[1],
+              fields
+            );
             entities.push(obj);
           }
         });
