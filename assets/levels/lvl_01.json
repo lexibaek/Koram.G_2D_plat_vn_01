@@ -76,6 +76,26 @@
             }
           ],
           "defUid": 4
+        },
+        {
+          "__identifier": "pickup",
+          "px": [
+            832,
+            256
+          ],
+          "fieldInstances": [
+            {
+              "__identifier": "slot",
+              "__value": "A",
+              "defUid": 7
+            },
+            {
+              "__identifier": "id",
+              "__value": "dash",
+              "defUid": 8
+            }
+          ],
+          "defUid": 4
         }
       ],
       "layerDefUid": 2

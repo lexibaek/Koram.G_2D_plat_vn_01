@@ -29,17 +29,27 @@ export default class Pickup extends Phaser.GameObjects.Zone {
   }
 
   setup(player: Phaser.GameObjects.GameObject) {
-    if (SaveManager.getFlag(this.flag)) {
+    const collected =
+      this.flag === 'dash'
+        ? SaveManager.getFlag('dashUnlocked')
+        : SaveManager.getFlag(this.flag);
+    if (collected) {
       this.destroy();
       return;
     }
 
     this.physics.overlap(player, this, () => {
-      SaveManager.setFlag(this.flag, true);
+      if (this.flag === 'dash') {
+        SaveManager.setFlag('dashUnlocked', true);
+        SaveManager.setFlag('dash', true);
+      } else {
+        SaveManager.setFlag(this.flag, true);
+      }
       if (player instanceof Player) {
         player.obtain(this.flag);
       }
       SaveManager.saveAuto();
+      this.emit('collected', this.flag);
       this.destroy();
     });
   }
