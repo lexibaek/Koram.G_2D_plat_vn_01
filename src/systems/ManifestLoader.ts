@@ -92,7 +92,6 @@ export default class ManifestLoader {
   }
 
   private keyFromPath(path: string) {
-    const parts = path.split('/');
-    return parts[parts.length - 1];
+    return path.replace(/\//g, '_');
   }
 }
