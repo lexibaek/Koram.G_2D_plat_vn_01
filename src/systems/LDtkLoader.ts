@@ -55,8 +55,12 @@ interface LoadOptions {
 export default class LDtkLoader {
   constructor(private scene: Phaser.Scene, private physics: PhysicsAdapter) {}
 
+  private keyFromPath(path: string) {
+    return path.replace(/\//g, '_');
+  }
+
   load(
-    key: string,
+    path: string,
     options: LoadOptions | Record<string, EntityConstructor> = {}
   ) {
     // Backward compatibility: allow passing factories map directly
@@ -66,27 +70,29 @@ export default class LDtkLoader {
 
     const factories = opts.factories ?? {};
 
-    if (key.endsWith('.ldtk')) {
+    const cacheKey = this.keyFromPath(path);
+
+    if (path.endsWith('.ldtk')) {
       if (!opts.levelId) {
         throw new Error(
           'LDtkLoader: levelId is required when loading a .ldtk project'
         );
       }
-      const project = this.scene.cache.json.get(key) as LDtkProject;
+      const project = this.scene.cache.json.get(cacheKey) as LDtkProject;
       const levelRef = project?.levels?.find(
         (l) => l.identifier === opts.levelId
       );
       if (!levelRef) {
         throw new Error(
-          `LDtkLoader: level '${opts.levelId}' not found in ${key}`
+          `LDtkLoader: level '${opts.levelId}' not found in ${path}`
         );
       }
-      const levelKey = levelRef.externalRelPath;
+      const levelKey = this.keyFromPath(levelRef.externalRelPath);
       const levelData = this.scene.cache.json.get(levelKey) as LDtkLevel;
       return this.buildLevel(levelData, factories);
     }
 
-    const levelData = this.scene.cache.json.get(key) as LDtkLevel;
+    const levelData = this.scene.cache.json.get(cacheKey) as LDtkLevel;
     return this.buildLevel(levelData, factories);
   }
 

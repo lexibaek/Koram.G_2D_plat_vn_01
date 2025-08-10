@@ -48,7 +48,7 @@ export default class Play extends Phaser.Scene {
   private async loadLevel() {
     try {
       const loader = new LDtkLoader(this, this.physicsAdapter);
-      const { collisionLayer, entities } = loader.load('world.ldtk', {
+      const { collisionLayer, entities } = loader.load('assets/levels/world.ldtk', {
         levelId: 'lvl_01',
         factories: {
           spawn: Player,
