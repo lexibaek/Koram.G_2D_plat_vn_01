@@ -19,6 +19,9 @@ export default class Player extends Phaser.GameObjects.Sprite {
   private inventory: string[] = [];
   private maxJumps = 1;
   private jumpsRemaining = 1;
+  private canGlide = false;
+  private isGliding = false;
+  private glideFallSpeed = 50;
 
   constructor(
     scene: Phaser.Scene,
@@ -59,6 +62,9 @@ export default class Player extends Phaser.GameObjects.Sprite {
       snap.player.inventory.includes('double_jump')
     ) {
       this.maxJumps = 2;
+    }
+    if (SaveManager.getFlag('glide') || snap.player.inventory.includes('glide')) {
+      this.canGlide = true;
     }
     this.jumpsRemaining = this.maxJumps;
   }
@@ -113,6 +119,17 @@ export default class Player extends Phaser.GameObjects.Sprite {
       this.coyoteTimer = 0;
       this.jumpsRemaining--;
     }
+
+    const wasGliding = this.isGliding;
+    if (!body.blocked.down && body.velocity.y > 0 && this.canGlide && this.input.jumpPressed) {
+      this.physics.setVelocity(this.bodyRef, body.velocity.x, this.glideFallSpeed);
+      this.isGliding = true;
+    } else {
+      this.isGliding = false;
+    }
+    if (wasGliding !== this.isGliding) {
+      // hook for glide animation/state change
+    }
   }
 
   getSnapshot() {
@@ -145,6 +162,19 @@ export default class Player extends Phaser.GameObjects.Sprite {
     } else {
       this.maxJumps = 1;
     }
+    this.canGlide = SaveManager.getFlag('glide') || this.inventory.includes('glide');
     this.jumpsRemaining = this.maxJumps;
+  }
+
+  public obtain(item: string) {
+    if (!this.inventory.includes(item)) {
+      this.inventory.push(item);
+    }
+    if (item === 'double_jump') {
+      this.maxJumps = 2;
+      this.jumpsRemaining = this.maxJumps;
+    } else if (item === 'glide') {
+      this.canGlide = true;
+    }
   }
 }
