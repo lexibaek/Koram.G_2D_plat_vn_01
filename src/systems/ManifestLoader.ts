@@ -12,6 +12,9 @@ interface Manifest {
 }
 
 interface LDtkProject {
+  defs?: {
+    tilesets?: { uid: number; relPath: string }[];
+  };
   levels?: { externalRelPath: string }[];
 }
 
@@ -49,6 +52,11 @@ export default class ManifestLoader {
               this.loader.json(levelKey, levelPath);
               this.queued.add(levelPath);
             }
+          });
+          data.defs?.tilesets?.forEach((ts) => {
+            const normalizedUrl =
+              '/' + (base + ts.relPath).replace(/^(\.\/|\/)/, '').replace(/\.\.\//g, '');
+            this.loader.image('ts_' + ts.uid, normalizedUrl);
           });
         });
       }
