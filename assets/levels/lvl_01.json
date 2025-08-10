@@ -4,15 +4,64 @@
   "pxHei": 384,
   "layerInstances": [
     {
-      "__identifier": "Background",
+      "__identifier": "Foreground",
       "__type": "Tiles",
       "gridSize": 32,
       "__cWid": 40,
       "__cHei": 12,
-      "gridTiles": []
+      "gridTiles": [],
+      "layerDefUid": 1
     },
     {
-      "__identifier": "Ground",
+      "__identifier": "Entities",
+      "__type": "Entities",
+      "gridSize": 32,
+      "entityInstances": [
+        {
+          "__identifier": "spawn",
+          "px": [
+            64,
+            256
+          ],
+          "fieldInstances": [
+            {
+              "__identifier": "facing",
+              "__value": "right",
+              "defUid": 1
+            }
+          ],
+          "defUid": 1
+        },
+        {
+          "__identifier": "dialogue",
+          "px": [
+            320,
+            256
+          ],
+          "fieldInstances": [
+            {
+              "__identifier": "knot",
+              "__value": "intro",
+              "defUid": 2
+            },
+            {
+              "__identifier": "once",
+              "__value": true,
+              "defUid": 3
+            },
+            {
+              "__identifier": "facingLock",
+              "__value": false,
+              "defUid": 4
+            }
+          ],
+          "defUid": 2
+        }
+      ],
+      "layerDefUid": 2
+    },
+    {
+      "__identifier": "Collision",
       "__type": "IntGrid",
       "gridSize": 32,
       "__cWid": 40,
@@ -498,64 +547,171 @@
         1,
         1,
         1
-      ]
+      ],
+      "layerDefUid": 3
     },
     {
-      "__identifier": "Foreground",
+      "__identifier": "Background",
       "__type": "Tiles",
       "gridSize": 32,
       "__cWid": 40,
       "__cHei": 12,
-      "gridTiles": []
-    },
-    {
-      "__identifier": "Entities",
-      "__type": "Entities",
-      "gridSize": 32,
-      "entityInstances": [
-        {
-          "__identifier": "spawn",
-          "px": [
-            64,
-            256
-          ],
-          "fieldInstances": [
-            {
-              "__identifier": "facing",
-              "__value": "right"
-            }
-          ]
-        },
-        {
-          "__identifier": "dialogue",
-          "px": [
-            320,
-            256
-          ],
-          "fieldInstances": [
-            {
-              "__identifier": "knot",
-              "__value": "intro"
-            },
-            {
-              "__identifier": "once",
-              "__value": true
-            },
-            {
-              "__identifier": "facingLock",
-              "__value": false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "__identifier": "Decor",
-      "__type": "Tiles",
-      "gridSize": 32,
-      "__cWid": 40,
-      "__cHei": 12,
-      "gridTiles": []
+      "gridTiles": [],
+      "layerDefUid": 4
     }
-  ]
+  ],
+  "__defs": {
+    "layers": [
+      {
+        "identifier": "Foreground",
+        "type": "Tiles",
+        "uid": 1
+      },
+      {
+        "identifier": "Entities",
+        "type": "Entities",
+        "uid": 2
+      },
+      {
+        "identifier": "Collision",
+        "type": "IntGrid",
+        "uid": 3
+      },
+      {
+        "identifier": "Background",
+        "type": "Tiles",
+        "uid": 4
+      }
+    ],
+    "entities": [
+      {
+        "identifier": "spawn",
+        "uid": 1,
+        "fieldDefs": [
+          {
+            "identifier": "facing",
+            "type": "Enum",
+            "enumRef": "FacingDir",
+            "uid": 1
+          }
+        ]
+      },
+      {
+        "identifier": "dialogue",
+        "uid": 2,
+        "fieldDefs": [
+          {
+            "identifier": "knot",
+            "type": "String",
+            "uid": 2
+          },
+          {
+            "identifier": "once",
+            "type": "Bool",
+            "uid": 3
+          },
+          {
+            "identifier": "facingLock",
+            "type": "Bool",
+            "uid": 4
+          },
+          {
+            "identifier": "id",
+            "type": "String",
+            "uid": 5
+          }
+        ]
+      },
+      {
+        "identifier": "exit",
+        "uid": 3,
+        "fieldDefs": [
+          {
+            "identifier": "target",
+            "type": "String",
+            "uid": 6
+          }
+        ]
+      },
+      {
+        "identifier": "pickup",
+        "uid": 4,
+        "fieldDefs": [
+          {
+            "identifier": "slot",
+            "type": "Enum",
+            "enumRef": "SaveSlot",
+            "uid": 7
+          },
+          {
+            "identifier": "id",
+            "type": "String",
+            "uid": 8
+          }
+        ]
+      },
+      {
+        "identifier": "hazard",
+        "uid": 5,
+        "fieldDefs": [
+          {
+            "identifier": "type",
+            "type": "Enum",
+            "enumRef": "HazardType",
+            "uid": 9
+          }
+        ]
+      },
+      {
+        "identifier": "checkpoint",
+        "uid": 6,
+        "fieldDefs": [
+          {
+            "identifier": "id",
+            "type": "String",
+            "uid": 10
+          }
+        ]
+      },
+      {
+        "identifier": "enemy",
+        "uid": 7,
+        "fieldDefs": [
+          {
+            "identifier": "facing",
+            "type": "Enum",
+            "enumRef": "FacingDir",
+            "uid": 11
+          }
+        ]
+      }
+    ],
+    "enums": [
+      {
+        "identifier": "FacingDir",
+        "uid": 1,
+        "values": [
+          "left",
+          "right"
+        ]
+      },
+      {
+        "identifier": "HazardType",
+        "uid": 2,
+        "values": [
+          "spikes",
+          "pit"
+        ]
+      },
+      {
+        "identifier": "SaveSlot",
+        "uid": 3,
+        "values": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    ]
+  }
 }
