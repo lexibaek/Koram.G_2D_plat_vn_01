@@ -7,9 +7,9 @@ import ArcadeAdapter from '../physics/ArcadeAdapter';
 import SaveManager, { GameSnapshot } from '../systems/SaveManager';
 
 export default class Play extends Phaser.Scene {
-  private player!: Player;
+  private player?: Player;
   private physicsAdapter!: PhysicsAdapter;
-  private debugText!: Phaser.GameObjects.Text;
+  private debugText?: Phaser.GameObjects.Text;
   private checkpointId = 'start';
   private startSnapshot?: GameSnapshot;
 
@@ -56,26 +56,40 @@ export default class Play extends Phaser.Scene {
         }
       });
 
-      this.player = entities.find((e) => e instanceof Player) as Player;
-      if (this.startSnapshot) {
+      const playerEntity = entities.find((e) => e instanceof Player);
+      if (!(playerEntity instanceof Player)) {
+        const width = this.scale.width;
+        const height = this.scale.height;
+        this.add
+          .text(width / 2, height / 2, 'Player not found')
+          .setOrigin(0.5);
+        return;
+      }
+      this.player = playerEntity;
+
+      if (this.startSnapshot && this.player) {
         this.checkpointId = this.startSnapshot.checkpointId;
         this.player.restore(this.startSnapshot.player);
       }
       SaveManager.updateLevel('lvl_01', this.checkpointId);
-      SaveManager.updatePlayer(this.player.getSnapshot());
+      if (this.player) {
+        SaveManager.updatePlayer(this.player.getSnapshot());
+      }
       SaveManager.saveAuto();
 
       entities.forEach((e) => {
-        if (e instanceof DialogueTrigger) {
+        if (e instanceof DialogueTrigger && this.player) {
           e.setup(this.player);
         }
       });
 
-      if (collisionLayer) {
+      if (collisionLayer && this.player) {
         this.physicsAdapter.collide(this.player, collisionLayer);
       }
 
-      this.cameras.main.startFollow(this.player);
+      if (this.player) {
+        this.cameras.main.startFollow(this.player);
+      }
       this.createDebugOverlay();
     } catch (err) {
       const width = this.scale.width;
@@ -136,7 +150,9 @@ export default class Play extends Phaser.Scene {
   public hitCheckpoint(id: string) {
     this.checkpointId = id;
     SaveManager.updateLevel('lvl_01', this.checkpointId);
-    SaveManager.updatePlayer(this.player.getSnapshot());
+    if (this.player) {
+      SaveManager.updatePlayer(this.player.getSnapshot());
+    }
     SaveManager.saveAuto();
   }
 }
