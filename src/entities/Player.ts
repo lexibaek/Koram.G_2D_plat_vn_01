@@ -85,14 +85,23 @@ export default class Player extends Phaser.GameObjects.Sprite {
     const snap = SaveManager.getSnapshot();
     if (
       SaveManager.getFlag('double_jump') ||
-      snap.player.inventory.includes('double_jump')
+      snap.player.inventory.includes('double_jump') ||
+      snap.player.abilities?.includes('double_jump')
     ) {
       this.maxJumps = 2;
     }
-    if (SaveManager.getFlag('glide') || snap.player.inventory.includes('glide')) {
+    if (
+      SaveManager.getFlag('glide') ||
+      snap.player.inventory.includes('glide') ||
+      snap.player.abilities?.includes('glide')
+    ) {
       this.canGlide = true;
     }
-    if (SaveManager.getFlag('dash') || snap.player.inventory.includes('dash')) {
+    if (
+      SaveManager.getFlag('dash') ||
+      snap.player.inventory.includes('dash') ||
+      snap.player.abilities?.includes('dash')
+    ) {
       this.dashUnlocked = true;
     }
     this.jumpsRemaining = this.maxJumps;
@@ -180,11 +189,22 @@ export default class Player extends Phaser.GameObjects.Sprite {
   }
 
   getSnapshot() {
+    const abilities: string[] = [];
+    if (this.maxJumps > 1) {
+      abilities.push('double_jump');
+    }
+    if (this.canGlide) {
+      abilities.push('glide');
+    }
+    if (this.dashUnlocked) {
+      abilities.push('dash');
+    }
     return {
       x: this.x,
       y: this.y,
       hp: this.hp,
       inventory: [...this.inventory],
+      abilities,
       maxJumps: this.maxJumps
     };
   }
@@ -195,22 +215,31 @@ export default class Player extends Phaser.GameObjects.Sprite {
     hp: number;
     inventory: string[];
     maxJumps?: number;
+    abilities?: string[];
   }) {
     this.setPosition(snapshot.x, snapshot.y);
     this.hp = snapshot.hp;
     this.inventory = [...snapshot.inventory];
+    const abilities = snapshot.abilities ?? [];
     if (snapshot.maxJumps !== undefined) {
       this.maxJumps = snapshot.maxJumps;
     } else if (
       SaveManager.getFlag('double_jump') ||
+      abilities.includes('double_jump') ||
       snapshot.inventory.includes('double_jump')
     ) {
       this.maxJumps = 2;
     } else {
       this.maxJumps = 1;
     }
-    this.canGlide = SaveManager.getFlag('glide') || this.inventory.includes('glide');
-    this.dashUnlocked = SaveManager.getFlag('dash') || this.inventory.includes('dash');
+    this.canGlide =
+      SaveManager.getFlag('glide') ||
+      abilities.includes('glide') ||
+      this.inventory.includes('glide');
+    this.dashUnlocked =
+      SaveManager.getFlag('dash') ||
+      abilities.includes('dash') ||
+      this.inventory.includes('dash');
     this.jumpsRemaining = this.maxJumps;
   }
 
