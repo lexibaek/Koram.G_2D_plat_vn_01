@@ -22,6 +22,14 @@ export default class Player extends Phaser.GameObjects.Sprite {
   private canGlide = false;
   private isGliding = false;
   private glideFallSpeed = 50;
+  private dashUnlocked = false;
+  private dashSpeed = 400;
+  private dashCooldown = 500;
+  private dashDuration = 150;
+  private dashTimer = 0;
+  private dashCooldownTimer = 0;
+  private isDashing = false;
+  private dashDir = 1;
 
   constructor(
     scene: Phaser.Scene,
@@ -56,7 +64,22 @@ export default class Player extends Phaser.GameObjects.Sprite {
       this.tryDropThrough();
     });
     this.input.on('dash', () => {
-      // hook for dash action
+      if (
+        this.dashUnlocked &&
+        this.dashCooldownTimer <= 0 &&
+        !this.isDashing
+      ) {
+        const body = this.bodyRef.raw as Phaser.Physics.Arcade.Body;
+        this.dashDir = this.moveDir.x >= 0 ? 1 : -1;
+        this.physics.setVelocity(
+          this.bodyRef,
+          this.dashDir * this.dashSpeed,
+          body.velocity.y
+        );
+        this.isDashing = true;
+        this.dashTimer = this.dashDuration;
+        this.dashCooldownTimer = this.dashCooldown;
+      }
     });
 
     const snap = SaveManager.getSnapshot();
@@ -68,6 +91,9 @@ export default class Player extends Phaser.GameObjects.Sprite {
     }
     if (SaveManager.getFlag('glide') || snap.player.inventory.includes('glide')) {
       this.canGlide = true;
+    }
+    if (SaveManager.getFlag('dash') || snap.player.inventory.includes('dash')) {
+      this.dashUnlocked = true;
     }
     this.jumpsRemaining = this.maxJumps;
   }
@@ -102,8 +128,26 @@ export default class Player extends Phaser.GameObjects.Sprite {
   preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
     const body = this.bodyRef.raw as Phaser.Physics.Arcade.Body;
-
-    this.physics.setVelocity(this.bodyRef, this.moveDir.x * this.speed, body.velocity.y);
+    if (this.isDashing) {
+      this.physics.setVelocity(
+        this.bodyRef,
+        this.dashDir * this.dashSpeed,
+        body.velocity.y
+      );
+      this.dashTimer -= delta;
+      if (this.dashTimer <= 0) {
+        this.isDashing = false;
+      }
+    } else {
+      this.physics.setVelocity(
+        this.bodyRef,
+        this.moveDir.x * this.speed,
+        body.velocity.y
+      );
+    }
+    if (this.dashCooldownTimer > 0) {
+      this.dashCooldownTimer -= delta;
+    }
 
     if (body.blocked.down) {
       this.coyoteTimer = this.coyoteTime;
@@ -166,6 +210,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
       this.maxJumps = 1;
     }
     this.canGlide = SaveManager.getFlag('glide') || this.inventory.includes('glide');
+    this.dashUnlocked = SaveManager.getFlag('dash') || this.inventory.includes('dash');
     this.jumpsRemaining = this.maxJumps;
   }
 
@@ -178,6 +223,8 @@ export default class Player extends Phaser.GameObjects.Sprite {
       this.jumpsRemaining = this.maxJumps;
     } else if (item === 'glide') {
       this.canGlide = true;
+    } else if (item === 'dash') {
+      this.dashUnlocked = true;
     }
   }
 }
