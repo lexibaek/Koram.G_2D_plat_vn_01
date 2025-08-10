@@ -26,7 +26,13 @@
       {
         "identifier": "Collision",
         "type": "IntGrid",
-        "uid": 3
+        "uid": 3,
+        "intGridValues": [
+          {
+            "value": 1,
+            "identifier": "solid"
+          }
+        ]
       },
       {
         "identifier": "Background",
