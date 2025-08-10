@@ -20,6 +20,11 @@ interface LDtkEntity {
   fieldInstances?: LDtkField[];
 }
 
+interface LDtkTile {
+  px: [number, number];
+  src: [number, number];
+}
+
 interface LDtkLayer {
   __identifier: string;
   __type: string;
@@ -28,8 +33,9 @@ interface LDtkLayer {
   __cWid?: number;
   __cHei?: number;
   entityInstances?: LDtkEntity[];
-  // Tiles data is loosely typed; we only read px
-  gridTiles?: { px: [number, number] }[];
+  gridTiles?: LDtkTile[];
+  autoLayerTiles?: LDtkTile[];
+  tilesetDefUid?: number;
 }
 
 interface LDtkLevel {
@@ -135,9 +141,23 @@ export default class LDtkLoader {
       } else if (
         (layer.__type === 'Tiles' || layer.__type === 'AutoLayer') &&
         (layer.__identifier === 'Background' || layer.__identifier === 'Foreground') &&
-        layer.gridTiles
+        (layer.gridTiles || layer.autoLayerTiles)
       ) {
-        // Currently ignored; kept for future use
+        const tiles = [
+          ...(layer.gridTiles ?? []),
+          ...(layer.autoLayerTiles ?? [])
+        ];
+        const size = layer.gridSize ?? 0;
+        const texKey = layer.tilesetDefUid ? `ts_${layer.tilesetDefUid}` : null;
+        tiles.forEach((t) => {
+          if (!texKey) return;
+          const [x, y] = t.px;
+          const [srcX, srcY] = t.src;
+          this.scene.add
+            .image(x, y, texKey)
+            .setOrigin(0, 0)
+            .setCrop(srcX, srcY, size, size);
+        });
       } else if (
         layer.__type === 'Entities' &&
         layer.__identifier === 'Entities' &&
