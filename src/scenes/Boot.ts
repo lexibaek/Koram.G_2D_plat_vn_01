@@ -6,8 +6,7 @@ export default class Boot extends Phaser.Scene {
   }
 
   preload() {
-    // Load configuration or any immediate assets
-    this.load.json('config', '/config.json');
+    // No configuration needed at boot time
   }
 
   create() {
