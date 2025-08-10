@@ -48,9 +48,12 @@ export default class Play extends Phaser.Scene {
   private async loadLevel() {
     try {
       const loader = new LDtkLoader(this, this.physicsAdapter);
-      const { collisionLayer, entities } = loader.load('lvl_01_test.json', {
-        spawn: Player,
-        dialogue: DialogueTrigger
+      const { collisionLayer, entities } = loader.load('world.ldtk', {
+        levelId: 'lvl_01_test',
+        factories: {
+          spawn: Player,
+          dialogue: DialogueTrigger
+        }
       });
 
       this.player = entities.find((e) => e instanceof Player) as Player;
