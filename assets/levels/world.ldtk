@@ -2,13 +2,13 @@
   "identifier": "world",
   "levels": [
     {
-      "identifier": "lvl_01_test",
+      "identifier": "lvl_01",
       "uid": 1,
       "worldX": 0,
       "worldY": 0,
       "pxWid": 1280,
       "pxHei": 384,
-      "externalRelPath": "lvl_01_test.json"
+      "externalRelPath": "lvl_01.json"
     }
   ],
   "defs": {
