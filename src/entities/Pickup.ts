@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import PhysicsAdapter from '../physics/PhysicsAdapter';
 import SaveManager from '../systems/SaveManager';
+import Player from './Player';
 
 export default class Pickup extends Phaser.GameObjects.Zone {
   private physics: PhysicsAdapter;
@@ -35,6 +36,9 @@ export default class Pickup extends Phaser.GameObjects.Zone {
 
     this.physics.overlap(player, this, () => {
       SaveManager.setFlag(this.flag, true);
+      if (player instanceof Player) {
+        player.obtain(this.flag);
+      }
       SaveManager.saveAuto();
       this.destroy();
     });
