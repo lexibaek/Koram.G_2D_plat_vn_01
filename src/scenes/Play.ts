@@ -49,7 +49,7 @@ export default class Play extends Phaser.Scene {
     try {
       const loader = new LDtkLoader(this, this.physicsAdapter);
       const { collisionLayer, entities } = loader.load('world.ldtk', {
-        levelId: 'lvl_01_test',
+        levelId: 'lvl_01',
         factories: {
           spawn: Player,
           dialogue: DialogueTrigger
@@ -61,7 +61,7 @@ export default class Play extends Phaser.Scene {
         this.checkpointId = this.startSnapshot.checkpointId;
         this.player.restore(this.startSnapshot.player);
       }
-      SaveManager.updateLevel('lvl_01_test', this.checkpointId);
+      SaveManager.updateLevel('lvl_01', this.checkpointId);
       SaveManager.updatePlayer(this.player.getSnapshot());
       SaveManager.saveAuto();
 
@@ -102,7 +102,7 @@ export default class Play extends Phaser.Scene {
         this.checkpointId = this.startSnapshot.checkpointId;
         this.player.restore(this.startSnapshot.player);
       }
-      SaveManager.updateLevel('lvl_01_test', this.checkpointId);
+      SaveManager.updateLevel('lvl_01', this.checkpointId);
       SaveManager.updatePlayer(this.player.getSnapshot());
       SaveManager.saveAuto();
 
@@ -135,7 +135,7 @@ export default class Play extends Phaser.Scene {
   // Simulated checkpoint trigger for autosave
   public hitCheckpoint(id: string) {
     this.checkpointId = id;
-    SaveManager.updateLevel('lvl_01_test', this.checkpointId);
+    SaveManager.updateLevel('lvl_01', this.checkpointId);
     SaveManager.updatePlayer(this.player.getSnapshot());
     SaveManager.saveAuto();
   }
