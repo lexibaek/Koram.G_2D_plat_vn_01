@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import LDtkLoader from '../systems/LDtkLoader';
 import Player from '../entities/Player';
 import DialogueTrigger from '../entities/DialogueTrigger';
+import Pickup from '../entities/Pickup';
 import PhysicsAdapter from '../physics/PhysicsAdapter';
 import ArcadeAdapter from '../physics/ArcadeAdapter';
 import SaveManager, { GameSnapshot } from '../systems/SaveManager';
@@ -52,7 +53,8 @@ export default class Play extends Phaser.Scene {
         levelId: 'lvl_01',
         factories: {
           spawn: Player,
-          dialogue: DialogueTrigger
+          dialogue: DialogueTrigger,
+          pickup: Pickup
         }
       });
 
@@ -78,7 +80,10 @@ export default class Play extends Phaser.Scene {
       SaveManager.saveAuto();
 
       entities.forEach((e) => {
-        if (e instanceof DialogueTrigger && this.player) {
+        if (!this.player) return;
+        if (e instanceof DialogueTrigger) {
+          e.setup(this.player);
+        } else if (e instanceof Pickup) {
           e.setup(this.player);
         }
       });
