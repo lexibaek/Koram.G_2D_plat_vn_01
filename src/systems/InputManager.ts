@@ -6,6 +6,7 @@ export default class InputManager extends Phaser.Events.EventEmitter {
   private wasd: { [key: string]: Phaser.Input.Keyboard.Key };
   private jumpKey: Phaser.Input.Keyboard.Key;
   private interactKey: Phaser.Input.Keyboard.Key;
+  private dashKey: Phaser.Input.Keyboard.Key;
 
   private joystickBase: Phaser.GameObjects.Arc;
   private joystickThumb: Phaser.GameObjects.Arc;
@@ -14,8 +15,10 @@ export default class InputManager extends Phaser.Events.EventEmitter {
 
   private jumpButton: Phaser.GameObjects.Arc;
   private interactButton: Phaser.GameObjects.Arc;
+  private dashButton: Phaser.GameObjects.Arc;
   private jumpButtonDown = false;
   private interactButtonDown = false;
+  private dashButtonDown = false;
 
   private dropThroughFlag = false;
   private dropComboPrev = false;
@@ -23,6 +26,7 @@ export default class InputManager extends Phaser.Events.EventEmitter {
   private prevMove = new Phaser.Math.Vector2();
   private prevLook = new Phaser.Math.Vector2();
   private prevJump = false;
+  private prevDash = false;
 
   constructor(scene: Phaser.Scene) {
     super();
@@ -32,6 +36,7 @@ export default class InputManager extends Phaser.Events.EventEmitter {
     this.wasd = scene.input.keyboard.addKeys('W,A,S,D') as any;
     this.jumpKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.interactKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.dashKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
     const radius = 40;
     const x = scene.scale.width - 80;
@@ -53,6 +58,7 @@ export default class InputManager extends Phaser.Events.EventEmitter {
       }
       this.jumpButtonDown = false;
       this.interactButtonDown = false;
+      this.dashButtonDown = false;
     });
 
     const btnR = 32;
@@ -71,6 +77,14 @@ export default class InputManager extends Phaser.Events.EventEmitter {
       .setScrollFactor(0)
       .setInteractive();
     this.interactButton.on('pointerdown', () => (this.interactButtonDown = true));
+
+    const dx = 160;
+    const dy = scene.scale.height - 80;
+    this.dashButton = scene
+      .add.circle(dx, dy, btnR, 0x888888, 0.3)
+      .setScrollFactor(0)
+      .setInteractive();
+    this.dashButton.on('pointerdown', () => (this.dashButtonDown = true));
 
     this.scene.events.on('update', this.handleUpdate, this);
 
@@ -146,6 +160,10 @@ export default class InputManager extends Phaser.Events.EventEmitter {
     return this.jumpKey.isDown || this.jumpButtonDown;
   }
 
+  get dashPressed() {
+    return this.dashKey.isDown || this.dashButtonDown;
+  }
+
   get dropThrough() {
     return this.dropThroughFlag;
   }
@@ -176,6 +194,11 @@ export default class InputManager extends Phaser.Events.EventEmitter {
     }
     this.prevJump = this.jumpPressed;
 
+    if (this.dashPressed && !this.prevDash) {
+      this.emit('dash');
+    }
+    this.prevDash = this.dashPressed;
+
     if (this.dropThroughFlag) {
       this.emit('drop');
     }
@@ -186,6 +209,7 @@ export default class InputManager extends Phaser.Events.EventEmitter {
       move: { x: Number(this.move.x.toFixed(2)), y: Number(this.move.y.toFixed(2)) },
       look: { x: Number(this.look.x.toFixed(2)), y: Number(this.look.y.toFixed(2)) },
       jumpPressed: this.jumpPressed,
+      dashPressed: this.dashPressed,
       interact: this.interact,
       dropThrough: this.dropThrough
     };
@@ -195,6 +219,7 @@ export default class InputManager extends Phaser.Events.EventEmitter {
       info.look.x !== 0 ||
       info.look.y !== 0 ||
       info.jumpPressed ||
+      info.dashPressed ||
       info.interact ||
       info.dropThrough
     ) {
