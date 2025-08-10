@@ -1,4 +1,6 @@
 {
+  "jsonVersion": "1.5.3",
+  "appBuildId": 48680,
   "identifier": "world",
   "levels": [
     {
@@ -30,7 +32,8 @@
         "intGridValues": [
           {
             "value": 1,
-            "identifier": "solid"
+            "identifier": "solid",
+            "color": "#ff0000"
           }
         ]
       },
