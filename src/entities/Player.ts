@@ -55,6 +55,9 @@ export default class Player extends Phaser.GameObjects.Sprite {
     this.input.on('drop', () => {
       this.tryDropThrough();
     });
+    this.input.on('dash', () => {
+      // hook for dash action
+    });
 
     const snap = SaveManager.getSnapshot();
     if (
