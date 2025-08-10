@@ -3,6 +3,7 @@ export interface PlayerSnapshot {
   y: number;
   hp: number;
   inventory: string[];
+  maxJumps: number;
 }
 
 export interface GameSnapshot {
@@ -20,7 +21,7 @@ export default class SaveManager {
   private static current: GameSnapshot = {
     levelId: 'lvl_01',
     checkpointId: 'start',
-    player: { x: 0, y: 0, hp: 100, inventory: [] },
+    player: { x: 0, y: 0, hp: 100, inventory: [], maxJumps: 1 },
     inkStateJson: null,
     flags: {}
   };

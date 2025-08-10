@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import InputManager from '../systems/InputManager';
 import PhysicsAdapter, { PhysicsBody } from '../physics/PhysicsAdapter';
+import SaveManager from '../systems/SaveManager';
 
 export default class Player extends Phaser.GameObjects.Sprite {
   public input: InputManager;
@@ -16,6 +17,8 @@ export default class Player extends Phaser.GameObjects.Sprite {
   private jumpSpeed = 330;
   private hp = 100;
   private inventory: string[] = [];
+  private maxJumps = 1;
+  private jumpsRemaining = 1;
 
   constructor(
     scene: Phaser.Scene,
@@ -49,6 +52,15 @@ export default class Player extends Phaser.GameObjects.Sprite {
     this.input.on('drop', () => {
       this.tryDropThrough();
     });
+
+    const snap = SaveManager.getSnapshot();
+    if (
+      SaveManager.getFlag('double_jump') ||
+      snap.player.inventory.includes('double_jump')
+    ) {
+      this.maxJumps = 2;
+    }
+    this.jumpsRemaining = this.maxJumps;
   }
 
   private tryDropThrough() {
@@ -86,6 +98,7 @@ export default class Player extends Phaser.GameObjects.Sprite {
 
     if (body.blocked.down) {
       this.coyoteTimer = this.coyoteTime;
+      this.jumpsRemaining = this.maxJumps;
     } else if (this.coyoteTimer > 0) {
       this.coyoteTimer -= delta;
     }
@@ -94,10 +107,11 @@ export default class Player extends Phaser.GameObjects.Sprite {
       this.jumpTimer -= delta;
     }
 
-    if (this.jumpTimer > 0 && (body.blocked.down || this.coyoteTimer > 0)) {
+    if (this.jumpTimer > 0 && this.jumpsRemaining > 0) {
       this.physics.setVelocity(this.bodyRef, body.velocity.x, -this.jumpSpeed);
       this.jumpTimer = 0;
       this.coyoteTimer = 0;
+      this.jumpsRemaining--;
     }
   }
 
@@ -106,13 +120,31 @@ export default class Player extends Phaser.GameObjects.Sprite {
       x: this.x,
       y: this.y,
       hp: this.hp,
-      inventory: [...this.inventory]
+      inventory: [...this.inventory],
+      maxJumps: this.maxJumps
     };
   }
 
-  restore(snapshot: { x: number; y: number; hp: number; inventory: string[] }) {
+  restore(snapshot: {
+    x: number;
+    y: number;
+    hp: number;
+    inventory: string[];
+    maxJumps?: number;
+  }) {
     this.setPosition(snapshot.x, snapshot.y);
     this.hp = snapshot.hp;
     this.inventory = [...snapshot.inventory];
+    if (snapshot.maxJumps !== undefined) {
+      this.maxJumps = snapshot.maxJumps;
+    } else if (
+      SaveManager.getFlag('double_jump') ||
+      snapshot.inventory.includes('double_jump')
+    ) {
+      this.maxJumps = 2;
+    } else {
+      this.maxJumps = 1;
+    }
+    this.jumpsRemaining = this.maxJumps;
   }
 }
