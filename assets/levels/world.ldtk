@@ -12,7 +12,157 @@
     }
   ],
   "defs": {
-    "layers": [],
-    "entities": []
+    "layers": [
+      {
+        "identifier": "Foreground",
+        "type": "Tiles",
+        "uid": 1
+      },
+      {
+        "identifier": "Entities",
+        "type": "Entities",
+        "uid": 2
+      },
+      {
+        "identifier": "Collision",
+        "type": "IntGrid",
+        "uid": 3
+      },
+      {
+        "identifier": "Background",
+        "type": "Tiles",
+        "uid": 4
+      }
+    ],
+    "entities": [
+      {
+        "identifier": "spawn",
+        "uid": 1,
+        "fieldDefs": [
+          {
+            "identifier": "facing",
+            "type": "Enum",
+            "enumRef": "FacingDir",
+            "uid": 1
+          }
+        ]
+      },
+      {
+        "identifier": "dialogue",
+        "uid": 2,
+        "fieldDefs": [
+          {
+            "identifier": "knot",
+            "type": "String",
+            "uid": 2
+          },
+          {
+            "identifier": "once",
+            "type": "Bool",
+            "uid": 3
+          },
+          {
+            "identifier": "facingLock",
+            "type": "Bool",
+            "uid": 4
+          },
+          {
+            "identifier": "id",
+            "type": "String",
+            "uid": 5
+          }
+        ]
+      },
+      {
+        "identifier": "exit",
+        "uid": 3,
+        "fieldDefs": [
+          {
+            "identifier": "target",
+            "type": "String",
+            "uid": 6
+          }
+        ]
+      },
+      {
+        "identifier": "pickup",
+        "uid": 4,
+        "fieldDefs": [
+          {
+            "identifier": "slot",
+            "type": "Enum",
+            "enumRef": "SaveSlot",
+            "uid": 7
+          },
+          {
+            "identifier": "id",
+            "type": "String",
+            "uid": 8
+          }
+        ]
+      },
+      {
+        "identifier": "hazard",
+        "uid": 5,
+        "fieldDefs": [
+          {
+            "identifier": "type",
+            "type": "Enum",
+            "enumRef": "HazardType",
+            "uid": 9
+          }
+        ]
+      },
+      {
+        "identifier": "checkpoint",
+        "uid": 6,
+        "fieldDefs": [
+          {
+            "identifier": "id",
+            "type": "String",
+            "uid": 10
+          }
+        ]
+      },
+      {
+        "identifier": "enemy",
+        "uid": 7,
+        "fieldDefs": [
+          {
+            "identifier": "facing",
+            "type": "Enum",
+            "enumRef": "FacingDir",
+            "uid": 11
+          }
+        ]
+      }
+    ],
+    "enums": [
+      {
+        "identifier": "FacingDir",
+        "uid": 1,
+        "values": [
+          "left",
+          "right"
+        ]
+      },
+      {
+        "identifier": "HazardType",
+        "uid": 2,
+        "values": [
+          "spikes",
+          "pit"
+        ]
+      },
+      {
+        "identifier": "SaveSlot",
+        "uid": 3,
+        "values": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    ]
   }
 }
