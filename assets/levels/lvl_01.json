@@ -9,7 +9,9 @@
       "gridSize": 32,
       "__cWid": 40,
       "__cHei": 12,
-      "gridTiles": [],
+      "gridTiles": [
+        { "px": [0, 352], "src": [0, 0], "f": 0, "t": 1 }
+      ],
       "layerDefUid": 1
     },
     {
@@ -596,8 +598,10 @@
       "gridSize": 32,
       "__cWid": 40,
       "__cHei": 12,
-      "gridTiles": [],
-      "layerDefUid": 4
+        "gridTiles": [
+          { "px": [0, 0], "src": [0, 0], "f": 0, "t": 1 }
+        ],
+        "layerDefUid": 4
     }
   ],
   "__defs": {
@@ -725,8 +729,24 @@
           }
         ]
       }
-    ],
-    "enums": [
+      ],
+      "tilesets": [
+        {
+          "__cWid": 4,
+          "__cHei": 4,
+          "identifier": "tileset2",
+          "uid": 41,
+          "relPath": "../tilesets/wood.png",
+          "embedAtlas": null,
+          "pxWid": 64,
+          "pxHei": 64,
+          "tileGridSize": 16,
+          "spacing": 0,
+          "padding": 0,
+          "tags": []
+        }
+      ],
+      "enums": [
       {
         "identifier": "FacingDir",
         "uid": 1,
