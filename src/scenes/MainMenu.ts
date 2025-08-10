@@ -20,7 +20,7 @@ export default class MainMenu extends Phaser.Scene {
       const fresh: GameSnapshot = {
         levelId: 'lvl_01',
         checkpointId: 'start',
-        player: { x: 0, y: 0, hp: 100, inventory: [] },
+        player: { x: 0, y: 0, hp: 100, inventory: [], maxJumps: 1 },
         inkStateJson: null,
         flags: {}
       };
