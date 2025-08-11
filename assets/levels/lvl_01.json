@@ -732,18 +732,14 @@
       ],
       "tilesets": [
         {
-          "__cWid": 4,
-          "__cHei": 4,
-          "identifier": "tileset2",
           "uid": 41,
           "relPath": "../tilesets/wood.png",
-          "embedAtlas": null,
-          "pxWid": 64,
-          "pxHei": 64,
-          "tileGridSize": 16,
-          "spacing": 0,
-          "padding": 0,
-          "tags": []
+          "tileGridSize": 16
+        },
+        {
+          "uid": 43,
+          "relPath": null,
+          "tileGridSize": 16
         }
       ],
       "enums": [
